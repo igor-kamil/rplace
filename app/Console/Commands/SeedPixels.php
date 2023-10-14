@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Redis;
 
@@ -26,9 +28,10 @@ class SeedPixels extends Command
      */
     public function handle()
     {
+        $userEmails = User::all()->pluck('email')->toArray();
         for ($x = 0; $x < config('settings.width'); $x++ ) {
             for ($y = 0; $y < config('settings.height'); $y++) {
-                Redis::set("{$x}:{$y}", rand(0,7));
+                Redis::set("{$x}:{$y}", rand(0,7) . ':' . Arr::random($userEmails));
             }
         }
     }
