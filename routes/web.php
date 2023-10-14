@@ -17,8 +17,8 @@ use App\Http\Controllers\ProfileController;
 
 Route::middleware('auth')->group(function () {
     Route::get('/', function () {
-        return view('welcome');
-    });
+        return view('app');
+    })->name('home');
     
     Route::get('/map', function () {
         $pixels = [];
