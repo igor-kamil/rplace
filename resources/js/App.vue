@@ -1,11 +1,14 @@
 <template>
-    <canvas width="100" height="100" ref="place"></canvas>
+    <canvas width="100" height="100" ref="place" @click="canvasClicked" :style="`transform: scale(${SCALE})`"></canvas>
+    <div class="absolute z-10 border-black border-2 shadow-[0_0_8px_4px_#000]" :style="overlayStyle" id="overlay" v-if="activePixel"></div>
 </template>
 
 <script setup>
-    import { onMounted, ref } from 'vue';
+    import { onMounted, ref, reactive } from 'vue';
 
+    const SCALE = 16;
     const place = ref(null);
+    const activePixel = ref(null);
 
     const colorOptions = {
         red: '231, 76, 60',
@@ -21,6 +24,8 @@
         }
     }
 
+    const overlayStyle = reactive({top: '0px', left: '0px', width: SCALE + 'px', height: SCALE + 'px'});
+
     onMounted(() => {
         fetch('/map')
             .then(response => response.json())
@@ -28,24 +33,27 @@
                 let ctx = place.value.getContext('2d');
                 data.forEach((column, x) => {
                     column.forEach((pixel, y) => {
-                        let [colorIndex, email] = pixel.split(":")
+                        let [colorIndex, email] = pixel.split(":");
                         ctx.fillStyle = 'rgb('+colorOptions.key(colorIndex)+')';
                         ctx.fillRect(x,y, 1, 1)
-                    })
+                    });
                 });
             });
-        
-        // const canvas = refs.place;
-        // const ctx = canvas.getContext('2d');
-        // ctx.fillStyle = 'red';
-        // ctx.fillRect(10, 10, 100, 100);
     });
+
+    const canvasClicked = () => {
+        let clickedX = Math.floor(event.pageX / SCALE);
+        let clickedY = Math.floor(event.pageY / SCALE);
+        activePixel.value = `${clickedX}:${clickedY}`;
+        overlayStyle.top = (clickedY * SCALE) + 'px';
+        overlayStyle.left = (clickedX * SCALE) + 'px';
+        activePixel.value = `${clickedX}:${clickedY}`;
+    }
 </script>
 
 <style>
     canvas {
         image-rendering: pixelated;
-        transform: scale(16);
         transform-origin: top left;
     }
 </style>
