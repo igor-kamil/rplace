@@ -14,9 +14,6 @@ class SeedPixels extends Command
      */
     protected $signature = 'pixels:seed';
 
-    const WIDTH = 100;
-    const HEIGHT = 100;
-
     /**
      * The console command description.
      *
@@ -29,8 +26,8 @@ class SeedPixels extends Command
      */
     public function handle()
     {
-        for ($x = 0; $x < self::WIDTH; $x++ ) {
-            for ($y = 0; $y < self::HEIGHT; $y++) {
+        for ($x = 0; $x < config('settings.width'); $x++ ) {
+            for ($y = 0; $y < config('settings.height'); $y++) {
                 Redis::set("{$x}:{$y}", rand(0,7));
             }
         }
