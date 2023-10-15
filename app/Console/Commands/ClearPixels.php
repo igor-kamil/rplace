@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Redis;
 
-class SeedPixels extends Command
+class ClearPixels extends Command
 {
     /**
      * The name and signature of the console command.
