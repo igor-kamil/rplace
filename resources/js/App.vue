@@ -32,13 +32,13 @@ const activePixel = ref(null);
 const map = ref([]);
 
 const colorOptions = {
+    white: "236, 240, 241",
     red: "231, 76, 60",
     orange: "230, 126, 34",
     yellow: "241, 196, 15",
     green: "46, 204, 113",
     blue: "52, 152, 219",
     purple: "155, 89, 182",
-    white: "236, 240, 241",
     black: "44, 62, 80",
     key: function (n) {
         return this[Object.keys(this)[n]];
