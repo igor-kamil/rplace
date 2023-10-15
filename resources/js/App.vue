@@ -25,6 +25,8 @@
 
 <script setup>
 import { onMounted, ref, reactive, computed } from "vue";
+import Echo from "laravel-echo";
+import Pusher from "pusher-js";
 
 const SCALE = 16;
 const place = ref(null);
@@ -66,6 +68,32 @@ onMounted(() => {
                 });
             });
         });
+
+    let echo = new Echo({
+        broadcaster: "pusher",
+        key: import.meta.env.VITE_PUSHER_APP_KEY,
+        wsHost: import.meta.env.VITE_PUSHER_HOST,
+        wsPort: import.meta.env.VITE_PUSHER_PORT,
+        wssPort: import.meta.env.VITE_PUSHER_PORT,
+        forceTLS: false,
+        encrypted: true,
+        disableStats: true,
+        enabledTransports: ["ws", "wss"],
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+    });
+
+    echo.channel("changes").listen("ColorChanged", (e) => {
+        // console.log(e.change);
+        let ctx = place.value.getContext("2d");
+        let [colorIndex, email] = e.change.color.split(":");
+
+        ctx.fillStyle = "rgb(" + colorOptions[Object.keys(colorOptions)[colorIndex]] + ")";
+
+        let [x, y] = e.change.key.split(":");
+        ctx.fillRect(x, y, 1, 1);
+
+        map.value[x][y] = `${colorIndex}:${email}`;
+    });
 });
 
 const canvasClicked = () => {

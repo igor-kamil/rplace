@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\ColorChanged;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
@@ -38,6 +39,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/save', function (Request $request) {
         
         Redis::set($request->key, $request->color . ':' . $request->user()->email);
+        ColorChanged::dispatch([
+            'key' => $request->key,
+            'color' => $request->color . ':' . $request->user()->email,
+        ]);
         return response()->json(Redis::get($request->key));
     });
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
