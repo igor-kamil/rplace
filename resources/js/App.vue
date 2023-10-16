@@ -1,25 +1,40 @@
 <template>
-    <canvas width="100" height="100" ref="place" @click="canvasClicked" :style="`transform: scale(${SCALE})`"></canvas>
+    <canvas width="100" height="100" ref="place" @click="canvasClicked" :style="`transform: scale(${scale})`"></canvas>
     <div
         class="absolute z-10 border-black border-2 shadow-[0_0_8px_4px_#000]"
-        :style="overlayStyle"
+        :style="{ width: scale + 'px', height: scale + 'px', top: activeTop, left: activeLeft }"
         id="overlay"
         v-if="activePixel"
     ></div>
-    <div id="colorPicker" class="fixed bg-white bottom-0 left-0 w-full p-1 text-center" v-if="activePixel">
-        <p class="mb-1">
-            Last changed by: <strong>{{ activePixelEmail }}</strong>
-        </p>
-        <nav>
-            <button
-                v-for="color in Object.keys(colorOptions)"
-                :key="color"
-                class="w-16 h-8 border-white border-2 rounded-sm mx-1 pointer hover:opacity-80"
-                :class="color"
-                @click="changePixel(color)"
-                :style="{ background: 'rgb(' + colorOptions[color] + ')' }"
-            ></button>
-        </nav>
+    <div id="colorPicker" class="fixed bg-white bottom-0 left-0 w-full p-1 text-center flex px-4" v-if="activePixel">
+        <div class="flex-1">
+            <p class="mb-1">
+                Last changed by: <strong>{{ activePixelEmail }}</strong>
+            </p>
+            <nav>
+                <button
+                    v-for="color in Object.keys(colorOptions)"
+                    :key="color"
+                    class="w-16 h-8 border-white border-2 rounded-sm mx-1 pointer hover:opacity-80"
+                    :class="color"
+                    @click="changePixel(color)"
+                    :style="{ background: 'rgb(' + colorOptions[color] + ')' }"
+                ></button>
+            </nav>
+        </div>
+
+        <div class="px-4">
+            <label for="scale-range" class="block mb-1 ">Scale:</label>
+            <input
+                id="scale-range"
+                type="range"
+                step="1"
+                min="10"
+                max="24"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                v-model="scale"
+            />
+        </div>
     </div>
 </template>
 
@@ -32,6 +47,7 @@ const SCALE = 16;
 const place = ref(null);
 const activePixel = ref(null);
 const map = ref([]);
+const scale = ref(SCALE);
 
 const colorOptions = {
     white: "236, 240, 241",
@@ -46,13 +62,6 @@ const colorOptions = {
         return this[Object.keys(this)[n]];
     },
 };
-
-const overlayStyle = reactive({
-    top: "0px",
-    left: "0px",
-    width: SCALE + "px",
-    height: SCALE + "px",
-});
 
 onMounted(() => {
     fetch("/map")
@@ -97,11 +106,9 @@ onMounted(() => {
 });
 
 const canvasClicked = () => {
-    let clickedX = Math.floor(event.pageX / SCALE);
-    let clickedY = Math.floor(event.pageY / SCALE);
+    let clickedX = Math.floor(event.pageX / scale.value);
+    let clickedY = Math.floor(event.pageY / scale.value);
     activePixel.value = `${clickedX}:${clickedY}`;
-    overlayStyle.top = clickedY * SCALE + "px";
-    overlayStyle.left = clickedX * SCALE + "px";
     activePixel.value = `${clickedX}:${clickedY}`;
 };
 
@@ -112,6 +119,15 @@ const activePixelEmail = computed(() => {
 
     let [x, y] = activePixel.value.split(":");
     return map.value[x][y].split(":")[1];
+});
+
+
+const activeTop = computed(() => {
+    return (activePixel.value) ? parseInt(activePixel.value.split(":")[1]) * scale.value + "px" : 0;
+});
+
+const activeLeft = computed(() => {
+    return (activePixel.value) ? parseInt(activePixel.value.split(":")[0]) * scale.value + "px" : 0;
 });
 
 const changePixel = (color) => {
