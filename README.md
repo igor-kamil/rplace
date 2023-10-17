@@ -18,7 +18,11 @@ Feel free to re/use and re/create.
  - real-time updates using broadcasting
  - range component for dynamic scale
 
- ![scale](https://github.com/igor-kamil/rplace/blob/media/scale.mp4?raw=true)
+
+
+https://github.com/igor-kamil/rplace/assets/2682941/e794d708-b00c-4885-a05f-d0e435dde8b0
+
+
 
 ## Requirements
 
